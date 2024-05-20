@@ -10,9 +10,9 @@ def create_app():
 
     db.init_app(app)
 
-    from .models.models import User  # Ensure models are imported here
-
     with app.app_context():
+        from . import models
+
         db.create_all()  # Creates all tables based on models if they don't exist
 
     from .routes import main

@@ -1,14 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Home Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product List</title>
+    <!-- Include PicoCSS -->
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
+      href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
     />
+    <style>
+      .product-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .product-table th,
+      .product-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      .product-table th {
+        background-color: #f2f2f2;
+      }
+      .product-table img {
+        max-width: 50px;
+        height: auto;
+      }
+    </style>
   </head>
   <body>
-    <h1>Welcome to the Home Page</h1>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <header class="container">
+      <h1>Product List</h1>
+    </header>
+    <main class="container">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Short Name</th>
+            <th>Model Name</th>
+            <th>Install Info</th>
+            <th>TV Type</th>
+            <th>Rating</th>
+            <th>Review Count</th>
+            <th>Original Price</th>
+            <th>Sale Price</th>
+            <th>Coupon Price</th>
+            <th>Brand</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td>
+              <img
+                src="{{ product.product_pic_s }}"
+                alt="{{ product.short_name }}"
+              />
+            </td>
+            <td>{{ product.short_name }}</td>
+            <td>{{ product.model_name }}</td>
+            <td>{{ product.install_info }}</td>
+            <td>{{ product.tv_type }}</td>
+            <td>{{ product.rating }}</td>
+            <td>{{ product.count }}</td>
+            <td>{{ product.original_price }}</td>
+            <td>{{ product.sale_price }}</td>
+            <td>{{ product.coupon_price }}</td>
+            <td>{{ product.brand }}</td>
+            <td>
+              <a href="{{ product.product_url }}" role="button">Product Link</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
   </body>
 </html>
