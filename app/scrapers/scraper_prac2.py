@@ -19,12 +19,12 @@ from ..models import Product
 
 def get_filename_suffix(url):
     try:
-        # Find the position of the last occurrence of '.jpg'
-        jpg_pos = url.rfind(".jpg")
+        # Find the position of the last occurrence of '.'
+        jpg_pos = url.rfind(".")
         if jpg_pos == -1:
             return None
 
-        # Extract the last 12 characters before '.jpg'
+        # Extract the last 12 characters before '.'
         start_pos = jpg_pos - 12
         if start_pos < 0:
             start_pos = 0
@@ -69,22 +69,31 @@ def scrape_url():
             submit_button.click()
 
         # Define a custom wait condition
-        def text_is_not_none(driver, previous_url):
+        def text_is_not_none(driver):
+            shorten_url = wait.until(
+                EC.presence_of_element_located(
+                    (
+                        By.CSS_SELECTOR,
+                        ".unselectable-input.shorten-url-input.large",
+                    )
+                )
+            )
             condition = True
             while condition:
                 element = driver.find_element(
                     By.CSS_SELECTOR, ".unselectable-input.shorten-url-input.large"
-                ).get_attribute("value")
+                ).text.strip()
 
+                # print(f"current url = {element}, previous url = {previous_url}")
                 if element == previous_url:
                     print("repeat link error. try again...")
                     time.sleep(3)
                 else:
                     condition = False
-            # print(element)
+
             return element
 
-        def get_shorten_url(product, driver, previous_url):
+        def get_shorten_url(product, driver):
             pic_s = product.product_pic_s
             pic_s = get_filename_suffix(pic_s)
             model_name = product.model_name
@@ -96,6 +105,7 @@ def scrape_url():
             )
             rows = prod_list.find_elements(By.CLASS_NAME, "product-row")
             the_item = 0
+            li_count = 0
             for row in rows:
                 if the_item == 0:
                     items = row.find_elements(By.CLASS_NAME, "product-item")
@@ -106,9 +116,10 @@ def scrape_url():
                         )
 
                         img_src = get_filename_suffix(img_src)
-
+                        li_count += 1
                         if img_src == pic_s:
-                            print(img_src, pic_s)
+                            print("image matched", img_src, pic_s)
+                            print("li_count: ", li_count)
                             the_item = item
                             break
                 else:
@@ -118,26 +129,25 @@ def scrape_url():
             if the_item == 0:
                 return None
 
-            actions.move_to_element(the_item).perform()
-            product_link_button = the_item.find_element(
-                By.CSS_SELECTOR, "button.btn-generate-link"
-            )
-            wait.until(EC.element_to_be_clickable(product_link_button))
-            product_link_button.click()
-
-            # link page
-            shorten_url = wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.CSS_SELECTOR,
-                        ".unselectable-input.shorten-url-input.large",
-                    )
+            try:
+                actions.move_to_element(the_item).perform()
+                product_link_button = the_item.find_element(
+                    By.CSS_SELECTOR, "button.btn-generate-link"
                 )
-            )
-            # Wait until the text is not None
-            shorten_url_text = WebDriverWait(driver, 10).until(
-                text_is_not_none(driver, previous_url)
-            )
+                wait.until(EC.element_to_be_clickable(product_link_button))
+                product_link_button.click()
+
+                # link page
+
+                # Wait until the text is not None
+                shorten_url_text = WebDriverWait(driver, 10).until(text_is_not_none)
+
+                print(shorten_url_text)
+
+            except:
+                print(f"found image but no actions perfome? why?")
+                return None
+
             return shorten_url_text
 
         # Set up Chrome options for headless mode
@@ -168,44 +178,27 @@ def scrape_url():
         # model_names = [product.model_name for product in Product.query.all()]
         products = Product.query.all()
 
-        previous_url = 0
+        previous_url = None
 
         for i in range(1, len(products) + 1):
             try:
                 the_product = products[i - 1]
                 the_product.shorten_url = None
 
-                shorten_url_text = get_shorten_url(the_product, driver, previous_url)
                 print(the_product.id, the_product.model_name)
-                print(shorten_url_text)
 
-                if shorten_url_text != None:
-                    if shorten_url_text == previous_url:
-                        while shorten_url_text == previous_url:
-                            print(
-                                f"same url error. do again product id: {the_product.id}"
-                            )
-                            # refresh
-                            url = "https://partners.coupang.com/#affiliate/ws/link/0/tv"
-                            driver.get(url)
-
-                            time.sleep(random.uniform(8, 10))
-
-                            shorten_url_text = get_shorten_url(
-                                the_product, driver, previous_url
-                            )
-
-                            print(the_product.id, the_product.model_name)
-                            print(shorten_url_text)
+                shorten_url_text = get_shorten_url(the_product, driver)
 
                 # Introduce a random delay between 1 and 3 seconds
-                time.sleep(random.uniform(8, 10))
+                time.sleep(random.uniform(1, 3))
 
                 # Update the Product with the shorten_url
                 if the_product:
                     the_product.shorten_url = shorten_url_text
                     db.session.commit()
-                    previous_url = shorten_url_text
+                    if shorten_url_text != None:
+                        previous_url = shorten_url_text
+
             except Exception as e:
                 print(f"Error processing model {i}: {e}")
                 continue
