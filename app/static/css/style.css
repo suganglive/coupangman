@@ -1,0 +1,125 @@
+.sidebar {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #f8f9fa;
+  padding: 15px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+.sidebar a {
+  display: block;
+  color: #000;
+  padding: 10px 0;
+  text-decoration: none;
+}
+.sidebar a:hover {
+  background-color: #ddd;
+}
+.main-content {
+  margin-left: 270px;
+  padding: 0px;
+}
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+th.product-name {
+  width: 30%;
+}
+.product-name > div {
+  display: flex;
+  align-items: center;
+}
+/* .product-name div {
+  display: flex;
+  align-items: center;
+} */
+.product-name .image-box {
+  flex: 0 0 30%; /* Fixed 30% width */
+  max-width: 30%; /* Ensure it doesn't grow larger */
+  margin-right: 10px;
+}
+.product-name .name-space {
+  flex: 1; /* Takes remaining space */
+  width: 70%; /* Ensure it takes the remaining 70% */
+  font-size: 0.8em; /* Adjust the font size as needed */
+}
+.product-name .model-name {
+  font-size: 0.5em;
+}
+.product-name .feature-button {
+  font-size: 0.6em;
+}
+.discount-rate {
+  font-size: 0.5em; /* Adjust the font size as needed */
+  color: #000;
+}
+.original-price {
+  color: #888;
+  text-decoration: line-through;
+  font-size: 0.5em; /* Adjust the font size as needed */
+}
+.discounted-price {
+  color: #d00;
+  font-weight: bold;
+  font-size: 0.8em; /* Adjust the font size as needed */
+}
+.rating-stars {
+  color: gold;
+  font-size: 1em; /* Adjust the star size as needed */
+  display: flex;
+  align-items: center;
+}
+.rate-count {
+  color: #007fff;
+  font-size: 0.6em;
+}
+.feature-button {
+  padding: 0.2em 0.2em;
+  border: 0.1em solid #ccc;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.feature-button:hover {
+  background-color: #e0e0e0;
+}
+.brand {
+  background-color: #007fff;
+}
+/* Base styles for the hyperlink to remove default blue color and underline */
+.img-link {
+  color: inherit; /* Inherit the color from the parent element */
+  text-decoration: none; /* Remove underline */
+  background-color: white; /* Ensure background color is white */
+}
+
+/* Hover effect for the hyperlink */
+.img-link:hover {
+  color: #555; /* Change to a subtle color on hover */
+}
+
+/* Add this to your CSS file */
+#price-sort-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 5px;
+}
+
+.sort-asc::after {
+  content: "▲";
+  font-size: 12px;
+  color: black;
+}
+
+.sort-desc::after {
+  content: "▼";
+  font-size: 12px;
+  color: black;
+}

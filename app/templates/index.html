@@ -1,82 +1,297 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product List</title>
-    <!-- Include PicoCSS -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
     />
-    <style>
-      .product-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .product-table th,
-      .product-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      .product-table th {
-        background-color: #f2f2f2;
-      }
-      .product-table img {
-        max-width: 50px;
-        height: auto;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <script></script>
   </head>
   <body>
-    <header class="container">
-      <h1>Product List</h1>
-    </header>
-    <main class="container">
-      <table class="product-table">
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Short Name</th>
-            <th>Model Name</th>
-            <th>Install Info</th>
-            <th>TV Type</th>
-            <th>Rating</th>
-            <th>Review Count</th>
-            <th>Original Price</th>
-            <th>Sale Price</th>
-            <th>Coupon Price</th>
-            <th>Brand</th>
-            <th>Link</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for product in products %}
-          <tr>
-            <td>
-              <img
-                src="{{ product.product_pic_s }}"
-                alt="{{ product.short_name }}"
-              />
-            </td>
-            <td>{{ product.short_name }}</td>
-            <td>{{ product.model_name }}</td>
-            <td>{{ product.install_info }}</td>
-            <td>{{ product.tv_type }}</td>
-            <td>{{ product.rating }}</td>
-            <td>{{ product.count }}</td>
-            <td>{{ product.original_price }}</td>
-            <td>{{ product.sale_price }}</td>
-            <td>{{ product.coupon_price }}</td>
-            <td>{{ product.brand }}</td>
-            <td>
-              <a href="{{ product.product_url }}" role="button">Product Link</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </main>
+    <aside class="sidebar">
+      <h2>Filters</h2>
+      <form
+        method="GET"
+        action="{{ url_for('main.index') }}"
+        onsubmit="concatenateAll()"
+      >
+        <input type="button" value="Reset" onclick="resetAllCheckboxes()" />
+        <fieldset>
+          <details>
+            <summary>Brand</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-brand"
+                  type="checkbox"
+                  onclick="toggleSelectAllBrand(this)"
+                />
+                <label for="select-all-brand">All</label>
+              </div>
+              {% for brand in brands %}
+              <div>
+                <input
+                  id="brand-{{ loop.index }}"
+                  data-name="brand"
+                  type="checkbox"
+                  value="{{ brand }}"
+                  {%
+                  if
+                  brand
+                  in
+                  selected_brands
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <div>
+                  <label for="brand-{{ loop.index }}" title="{{ brand }}"
+                    >{{ brand }}</label
+                  >
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="brand" id="brandInput" value="" />
+        <fieldset>
+          <details>
+            <summary>Size</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-size"
+                  type="checkbox"
+                  onclick="toggleSelectAllSize(this)"
+                />
+                <label for="select-all-size">All</label>
+              </div>
+              {% for size in sizes %}
+              <div>
+                <input
+                  id="size-{{ loop.index }}"
+                  data-name="size"
+                  type="checkbox"
+                  value="{{ size }}"
+                  {%
+                  if
+                  size
+                  in
+                  selected_sizes
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <div>
+                  <label for="size-{{ loop.index }}" title="{{ size }}"
+                    >{{ size }}</label
+                  >
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="size" id="sizeInput" value="" />
+        <fieldset>
+          <details>
+            <summary>Panel</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-panel"
+                  type="checkbox"
+                  onclick="toggleSelectAllPanel(this)"
+                />
+                <label for="select-all-panel">All</label>
+              </div>
+              {% for panel in panels %}
+              <div>
+                <input
+                  id="panel-{{ loop.index }}"
+                  data-name="panel"
+                  type="checkbox"
+                  value="{{ panel }}"
+                  {%
+                  if
+                  panel
+                  in
+                  selected_panels
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <div>
+                  <label for="panel-{{ loop.index }}" title="{{ panel }}"
+                    >{{ panel }}</label
+                  >
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="panel" id="panelInput" value="" />
+        <fieldset>
+          <details>
+            <summary>Resolution</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-resolution"
+                  type="checkbox"
+                  onclick="toggleSelectAllResolution(this)"
+                />
+                <label for="select-all-resolution">All</label>
+              </div>
+              {% for resolution in resolutions %}
+              <div>
+                <input
+                  id="resolution-{{ loop.index }}"
+                  data-name="resolution"
+                  type="checkbox"
+                  value="{{ resolution }}"
+                  {%
+                  if
+                  resolution
+                  in
+                  selected_resolutions
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <div>
+                  <label
+                    for="resolution-{{ loop.index }}"
+                    title="{{ resolution }}"
+                    >{{ resolution }}</label
+                  >
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="resolution" id="resolutionInput" value="" />
+
+        <input type="submit" value="Filter" />
+      </form>
+    </aside>
+    <div class="main-content">
+      <main class="container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" class="product-name">Name</th>
+              <th scope="col" id="price-header" class="sortable">
+                Price <span id="price-sort-icon"></span>
+              </th>
+              <th scope="col">Rating</th>
+              <th scope="col">Features</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %} {% if product.shorten_url is not
+            none%}
+            <tr>
+              <th scope="row" class="product-name">
+                <div>
+                  <div class="image-box">
+                    <a
+                      href="{{ product.shorten_url  }}"
+                      class="img-link"
+                      target="_blank"
+                      ><img
+                        src="{{ product.product_pic_s }}"
+                        alt="{{ product.short_name }}"
+                    /></a>
+                  </div>
+                  <div class="name-space">
+                    <a
+                      href="{{  product.shorten_url  }}"
+                      class="img-link"
+                      target="_blank"
+                    >
+                      <span title="{{ product.short_name }}"
+                        >{{ product.short_name|truncate }}</span
+                      ><br />
+                      <span class="model-name">({{ product.model_name }})</span
+                      ><br />
+                      {% for feature in product.features %}
+                      <span class="feature-button">{{ feature.name }}</span>{%
+                      if not loop.last %} {% endif %} {% endfor %}
+                    </a>
+                  </div>
+                </div>
+              </th>
+              <td>
+                <div
+                  class="price-details"
+                  data-discount-rate="{{ product.discount_rate }}"
+                >
+                  <span class="discount-rate"
+                    >{{ product.discount_rate }}%</span
+                  >
+                  <span class="original-price"
+                    >{{ product.highest_price}}원</span
+                  ><br />
+                  <span class="discounted-price"
+                    >{{ product.lowest_price }}원</span
+                  >
+                </div>
+              </td>
+              <td>
+                <div
+                  class="rating-details"
+                  data-rate-count="{{ product.count }}"
+                  data-rating="{{ product.rating }}"
+                >
+                  {% if "no review" not in product.count %}
+                  <span class="rating-stars"></span>
+                  <!-- <span>{{ product.rating }}</span> -->
+                  <span class="rate-count"
+                    >{{ product.count|strip }}개 상품평</span
+                  >
+                  {% else %}
+                  <span class="no-review">No review</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <div class="other-features">
+                  <span class="feature-button brand container"
+                    >{{ product.brand }}</span
+                  ><br />
+                  <br />
+                  {% if "no info" not in product.count %}
+                  <span class="feature-button container"
+                    >{{ product.tv_type }}</span
+                  >
+                  {% endif %} {% if "no release date" not in product.count %}
+                  <span class="feature-button container"
+                    >{{ product.release }}</span
+                  >
+                  {% endif %} {% if "no info" not in product.install_info %}
+                  <span class="feature-button container"
+                    >{{ product.install_info }}</span
+                  >
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endif %} {% endfor %}
+          </tbody>
+        </table>
+      </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   </body>
 </html>
