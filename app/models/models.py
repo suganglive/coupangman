@@ -1,3 +1,5 @@
+from custom_types import JSONEncodedDict
+
 from .. import db
 
 # Association table for many-to-many relationship between Product and Feature
@@ -27,7 +29,7 @@ class Product(db.Model):
     brand = db.Column(db.String(50), nullable=False)
     product_url = db.Column(db.String(255), nullable=False)
     release = db.Column(db.String(50), nullable=False)
-    shorten_url = db.Column(db.String(100), nullable=True)
+    shorten_url = db.Column(db.String(255), nullable=True)
     # Relationship with Feature
     features = db.relationship(
         "Feature",
@@ -38,5 +40,7 @@ class Product(db.Model):
 
 class Feature(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    feature_code = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(255), nullable=False)
+    value = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)

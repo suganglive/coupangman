@@ -194,7 +194,9 @@
               <th scope="col" id="price-header" class="sortable">
                 Price <span id="price-sort-icon"></span>
               </th>
-              <th scope="col">Rating</th>
+              <th scope="col" id="rating-header" class="sortable">
+                Rating <span id="rating-sort-icon"></span>
+              </th>
               <th scope="col">Features</th>
             </tr>
           </thead>
@@ -225,9 +227,10 @@
                       ><br />
                       <span class="model-name">({{ product.model_name }})</span
                       ><br />
-                      {% for feature in product.features %}
-                      <span class="feature-button">{{ feature.name }}</span>{%
-                      if not loop.last %} {% endif %} {% endfor %}
+                      {% for feature in product.features %} {% if
+                      feature.feature_code == 1 and feature.value != "" %}
+                      <span class="feature-button">{{ feature.value }}</span>{%
+                      if not loop.last %} {% endif %} {% endif %}{% endfor %}
                     </a>
                   </div>
                 </div>
