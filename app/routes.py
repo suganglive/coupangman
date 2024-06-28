@@ -1,31 +1,72 @@
-# routes.py
 import re
 
 from flask import Blueprint, render_template, request
+from sqlalchemy.orm import aliased
 
 from app import db
 from app.models import Feature, Product  # Import the Product model
 
+# Aliases for the Feature table to handle different filter criteria
+size_feature = aliased(Feature)
+panel_feature = aliased(Feature)
+resolution_feature = aliased(Feature)
+
 main = Blueprint("main", __name__)
 
 
-def find_matches(pattern, items):
-    """
-    Find all items in the list that match the given regex pattern.
+def get_screen_sizes():
+    # Query to get all feature values where name is 'screen_size'
+    screen_sizes = Feature.query.filter_by(name="screen_size").all()
+    screen_size_values = [feature.value for feature in screen_sizes]
 
-    :param pattern: Regex pattern to match.
-    :param items: List of strings to search.
-    :return: List of matching items.
-    """
-    regex = re.compile(pattern)
-    matches = [item for item in items if regex.search(item)]
-    return matches
+    # Filter out entries containing 'cm' and empty strings
+    filtered_screen_sizes = [
+        size for size in screen_size_values if size and "cm" not in size
+    ]
+
+    # Sort the filtered screen sizes
+    def parse_size(size):
+        try:
+            return int(size.replace("인치", ""))
+        except ValueError:
+            return float("inf")  # handle non-integer sizes gracefully
+
+    sorted_screen_sizes = sorted(filtered_screen_sizes, key=parse_size)
+
+    return sorted_screen_sizes
 
 
-pattern_size = r"\d+인치\(\d+cm\)"
-pattern_panel = r"ED$"
-# Pattern to match strings that do not match pattern_size or pattern_panel
-pattern_resol = r"^(?!.*\d+인치\(\d+cm\))(?!.*ED$)(?!^[가-힣]+$).*$"
+def get_display_techs():
+    display_techs = Feature.query.filter_by(name="display_tech").all()
+    display_tech_values = [feature.value for feature in display_techs]
+
+    filtered_values = [
+        display_tech for display_tech in display_tech_values if display_tech
+    ]
+    return filtered_values
+
+
+def get_resolutions():
+    resolutions = Feature.query.filter_by(name="resolution").all()
+    resolution_values = [feature.value for feature in resolutions]
+
+    filtered_values = [resolution for resolution in resolution_values if resolution]
+
+    return filtered_values
+
+
+def get_product_features(product_id):
+    product = Product.query.get(product_id)
+    features = product.features
+
+    # Organize features by feature_code
+    feature_dict = {}
+    for feature in features:
+        if feature.feature_code not in feature_dict:
+            feature_dict[feature.feature_code] = []
+        feature_dict[feature.feature_code].append(feature)
+
+    return feature_dict
 
 
 @main.route("/", methods=["GET"])
@@ -55,24 +96,27 @@ def index():
         query = query.filter(Product.brand.in_(selected_brands))
 
     if selected_sizes:
-        query = query.join(Product.features).filter(Feature.name.in_(selected_sizes))
+        query = query.join(size_feature, Product.features).filter(
+            size_feature.value.in_(selected_sizes)
+        )
 
     if selected_panels:
-        query = query.join(Product.features).filter(Feature.name.in_(selected_panels))
+        query = query.join(panel_feature, Product.features).filter(
+            panel_feature.value.in_(selected_panels)
+        )
 
     if selected_resolutions:
-        query = query.join(Product.features).filter(
-            Feature.name.in_(selected_resolutions)
+        query = query.join(resolution_feature, Product.features).filter(
+            resolution_feature.value.in_(selected_resolutions)
         )
 
     products = query.all()
 
     features = db.session.query(Feature.name).distinct().all()
     features = [feature[0] for feature in features]
-    sizes = find_matches(pattern_size, features)
-    resolutions = find_matches(pattern_resol, features)
-    panels = find_matches(pattern_panel, features)
-
+    sizes = get_screen_sizes()
+    panels = get_display_techs()
+    resolutions = get_resolutions()
     brands = db.session.query(Product.brand).distinct().all()
     brands = [brand[0] for brand in brands]  # Unpack tuples
 
@@ -90,26 +134,8 @@ def index():
     )
 
 
-# @main.route("/")
-# def index():
-#     products = Product.query.all()  # Query all products from the database
-#     return render_template(
-#         "index.html", products=products
-#     )  # Pass the products to the template
-
-
-# @main.route("/?")
-# def filter():
-#     selected_brands = request.args.getlist("brand")
-#     print(selected_brands)
-#     # Filtering products based on selected brands
-#     if selected_brands:
-#         products = Product.query.filter(Product.brand.in_(selected_brands)).all()
-#     else:
-#         products = Product.query.all()
-#     return render_template("index.html", products=products)
-
-
-# @main.route("/product")
-# def product():
-#     return render_template("product.html")
+@main.route("/model/<int:id>", methods=["GET"])
+def model(id):
+    product = Product.query.get_or_404(id)
+    features = get_product_features(id)
+    return render_template("model.html", product=product, features=features)

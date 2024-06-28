@@ -29,6 +29,7 @@ table {
 th.product-name {
   width: 30%;
 }
+
 .product-name > div {
   display: flex;
   align-items: center;
@@ -50,7 +51,7 @@ th.product-name {
 .product-name .model-name {
   font-size: 0.5em;
 }
-.product-name .feature-button {
+.feature-button {
   font-size: 0.6em;
 }
 .discount-rate {
@@ -90,7 +91,11 @@ th.product-name {
   background-color: #e0e0e0;
 }
 .brand {
-  background-color: #007fff;
+  background-color: rgb(1, 114, 173);
+  color: white;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 0.3em;
 }
 /* Base styles for the hyperlink to remove default blue color and underline */
 .img-link {
@@ -122,4 +127,9 @@ th.product-name {
   content: "▼";
   font-size: 12px;
   color: black;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
 }

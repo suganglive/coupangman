@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product List</title>
+    <title>꿀매 리스트</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
@@ -36,7 +36,7 @@
                 <label for="select-all-brand">All</label>
               </div>
               {% for brand in brands %}
-              <div>
+              <div class="filter-container">
                 <input
                   id="brand-{{ loop.index }}"
                   data-name="brand"
@@ -51,11 +51,9 @@
                   endif
                   %}
                 />
-                <div>
-                  <label for="brand-{{ loop.index }}" title="{{ brand }}"
-                    >{{ brand }}</label
-                  >
-                </div>
+                <label for="brand-{{ loop.index }}" title="{{ brand }}"
+                  >{{ brand }}</label
+                >
               </div>
               {% endfor %}
             </div>
@@ -75,7 +73,7 @@
                 <label for="select-all-size">All</label>
               </div>
               {% for size in sizes %}
-              <div>
+              <div class="filter-container">
                 <input
                   id="size-{{ loop.index }}"
                   data-name="size"
@@ -90,11 +88,9 @@
                   endif
                   %}
                 />
-                <div>
-                  <label for="size-{{ loop.index }}" title="{{ size }}"
-                    >{{ size }}</label
-                  >
-                </div>
+                <label for="size-{{ loop.index }}" title="{{ size }}"
+                  >{{ size }}</label
+                >
               </div>
               {% endfor %}
             </div>
@@ -114,7 +110,7 @@
                 <label for="select-all-panel">All</label>
               </div>
               {% for panel in panels %}
-              <div>
+              <div class="filter-container">
                 <input
                   id="panel-{{ loop.index }}"
                   data-name="panel"
@@ -129,11 +125,9 @@
                   endif
                   %}
                 />
-                <div>
-                  <label for="panel-{{ loop.index }}" title="{{ panel }}"
-                    >{{ panel }}</label
-                  >
-                </div>
+                <label for="panel-{{ loop.index }}" title="{{ panel }}"
+                  >{{ panel }}</label
+                >
               </div>
               {% endfor %}
             </div>
@@ -153,7 +147,7 @@
                 <label for="select-all-resolution">All</label>
               </div>
               {% for resolution in resolutions %}
-              <div>
+              <div class="filter-container">
                 <input
                   id="resolution-{{ loop.index }}"
                   data-name="resolution"
@@ -168,13 +162,11 @@
                   endif
                   %}
                 />
-                <div>
-                  <label
-                    for="resolution-{{ loop.index }}"
-                    title="{{ resolution }}"
-                    >{{ resolution }}</label
-                  >
-                </div>
+                <label
+                  for="resolution-{{ loop.index }}"
+                  title="{{ resolution }}"
+                  >{{ resolution }}</label
+                >
               </div>
               {% endfor %}
             </div>
@@ -208,7 +200,7 @@
                 <div>
                   <div class="image-box">
                     <a
-                      href="{{ product.shorten_url  }}"
+                      href="{{ url_for('main.model', id=product.id) }}"
                       class="img-link"
                       target="_blank"
                       ><img
@@ -218,7 +210,7 @@
                   </div>
                   <div class="name-space">
                     <a
-                      href="{{  product.shorten_url  }}"
+                      href="{{ url_for('main.model', id=product.id) }}"
                       class="img-link"
                       target="_blank"
                     >
@@ -270,23 +262,33 @@
               </td>
               <td>
                 <div class="other-features">
-                  <span class="feature-button brand container"
+                  <!-- <span class="feature-button brand container"
                     >{{ product.brand }}</span
-                  ><br />
+                  ><br /> -->
+                  {% set feature_code_4_exists = [] %} {% set game_mode_exists =
+                  [] %} {% for feature in product.features %} {% if
+                  feature.feature_code == 4 %} {% set _ =
+                  feature_code_4_exists.append(true) %} {% endif %} {% if
+                  feature.name == "게임모드" %} {% set _ =
+                  game_mode_exists.append(true) %} {% endif %} {% endfor %} {%
+                  set line_break_needed = feature_code_4_exists or
+                  game_mode_exists %} {% if feature_code_4_exists %}
+                  <span class="feature-button">스마트 TV</span>
+                  {% endif %} {% if game_mode_exists %}
+                  <span class="feature-button">게임모드</span>
+                  {% endif %} {% if line_break_needed %}
                   <br />
-                  {% if "no info" not in product.count %}
-                  <span class="feature-button container"
-                    >{{ product.tv_type }}</span
-                  >
-                  {% endif %} {% if "no release date" not in product.count %}
-                  <span class="feature-button container"
-                    >{{ product.release }}</span
-                  >
-                  {% endif %} {% if "no info" not in product.install_info %}
-                  <span class="feature-button container"
-                    >{{ product.install_info }}</span
-                  >
                   {% endif %}
+                  <!-- <br /> -->
+                  {% if "no info" not in product.count %}
+                  <span class="feature-button">{{ product.tv_type }}</span>
+                  {% endif %}{% if "no info" not in product.install_info %}
+                  <span class="feature-button">{{ product.install_info }}</span>
+                  {% endif %} {% for feature in product.features %} {% if
+                  feature.name|match("[0-9]+년형") %}<span
+                    class="feature-button"
+                    >{{ feature.name }}</span
+                  >{% endif %} {% endfor %}
                 </div>
               </td>
             </tr>

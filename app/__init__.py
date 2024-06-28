@@ -1,3 +1,5 @@
+import re
+
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -22,8 +24,22 @@ def create_app():
             return value[:length] + "..."
         return value
 
+    # Custom filter to match regex patterns
+    def match_filter(s, pattern):
+        return re.match(pattern, s) is not None
+
+    # Custom filter to add commas as thousands separators
+    def add_commas(value):
+        value = int(value)
+        if isinstance(value, (int, float)):
+            return "{:,}".format(value)
+        return value
+
+    # Register the custom filter with Jinja
+    app.jinja_env.filters["add_commas"] = add_commas
     app.jinja_env.filters["strip"] = strip_filter
     app.jinja_env.filters["truncate"] = truncate_filter
+    app.jinja_env.filters["match"] = match_filter
 
     db.init_app(app)
     migrate.init_app(app, db)
