@@ -9,6 +9,7 @@ function resetAllCheckboxes() {
   document.getElementById("sizeInput").value = "";
   document.getElementById("panelInput").value = "";
   document.getElementById("resolutionInput").value = "";
+  document.getElementById("releaseDateInput").value = "";
 }
 
 function concatenateBrands() {
@@ -87,11 +88,53 @@ function toggleSelectAllResolution(source) {
   concatenateResolution(); // Update the hidden input value as well
 }
 
+function concatenateReleaseYears() {
+  const checkboxes = document.querySelectorAll(
+    'input[data-name="release-year"]:checked'
+  );
+  const selectedReleaseYears = Array.from(checkboxes)
+    .map((cb) => cb.value)
+    .join("|");
+  document.getElementById("releaseYearInput").value = selectedReleaseYears;
+}
+
+// Function to handle the "select all" functionality
+function toggleSelectAllReleaseYear(source) {
+  const checkboxes = document.querySelectorAll(
+    'input[data-name="release-year"]'
+  );
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = source.checked;
+  });
+  concatenateReleaseYears(); // Update the hidden input value as well
+}
+
+function concatenateOthers() {
+  const checkboxes = document.querySelectorAll(
+    'input[data-name="other"]:checked'
+  );
+  const selectedOthers = Array.from(checkboxes)
+    .map((cb) => cb.value)
+    .join("|");
+  document.getElementById("otherInput").value = selectedOthers;
+}
+
+// Function to handle the "select all" functionality
+function toggleSelectAllOthers(source) {
+  const checkboxes = document.querySelectorAll('input[data-name="other"]');
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = source.checked;
+  });
+  concatenateOthers(); // Update the hidden input value as well
+}
+
 function concatenateAll() {
   concatenateBrands();
   concatenateSize();
   concatenatePanel();
   concatenateResolution();
+  concatenateReleaseYears();
+  concatenateOthers(); // Include the new function
 }
 
 document.addEventListener("DOMContentLoaded", function () {

@@ -1,6 +1,7 @@
 import re
 
 from flask import Blueprint, render_template, request
+from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 
 from app import db
@@ -10,6 +11,9 @@ from app.models import Feature, Product  # Import the Product model
 size_feature = aliased(Feature)
 panel_feature = aliased(Feature)
 resolution_feature = aliased(Feature)
+release_year_feature = aliased(Feature)
+smart_tv_feature = aliased(Feature)
+game_mode_feature = aliased(Feature)
 
 main = Blueprint("main", __name__)
 
@@ -55,6 +59,25 @@ def get_resolutions():
     return filtered_values
 
 
+def get_release_years():
+    # Query to get all features where the name matches the pattern "??년형" and sort them in descending order
+    release_years = (
+        Feature.query.filter(Feature.name.op("regexp")("^[0-9]{4}년형$"))
+        .order_by(Feature.name.desc())
+        .all()
+    )
+
+    # Extract the name values
+    release_years_values = [feature.name for feature in release_years]
+
+    # Filter out any empty values
+    filtered_values = [
+        release_year for release_year in release_years_values if release_year
+    ]
+
+    return filtered_values
+
+
 def get_product_features(product_id):
     product = Product.query.get(product_id)
     features = product.features
@@ -89,6 +112,16 @@ def index():
     )
     print("Selected resolutions: ", selected_resolutions)
 
+    selected_others_param = request.args.get("other", "")
+    selected_others = selected_others_param.split("|") if selected_others_param else []
+    print("Selected others: ", selected_others)
+
+    selected_release_years_param = request.args.get("release_year", "")
+    selected_release_years = (
+        selected_release_years_param.split("|") if selected_release_years_param else []
+    )
+    print("Selected release years: ", selected_release_years)
+
     # Filtering products based on selected brands
     query = Product.query
 
@@ -110,6 +143,33 @@ def index():
             resolution_feature.value.in_(selected_resolutions)
         )
 
+    # # Apply other filters (smart_tv and game_mode)
+    # if "smart_tv" in selected_others or "game_mode" in selected_others:
+    #     query = query.join(Feature, Product.features)
+
+    #     other_conditions = []
+    #     if "smart_tv" in selected_others:
+    #         other_conditions.append(Feature.feature_code == 4)
+    #     if "game_mode" in selected_others:
+    #         other_conditions.append(Feature.name == "게임모드")
+
+    #     query = query.filter(or_(*other_conditions))
+
+    if "smart_tv" in selected_others:
+        query = query.join(smart_tv_feature, Product.features).filter(
+            smart_tv_feature.feature_code == 4,
+        )
+
+    if "game_mode" in selected_others:
+        query = query.join(game_mode_feature, Product.features).filter(
+            game_mode_feature.name == "게임모드",
+        )
+
+    if selected_release_years:
+        query = query.join(release_year_feature, Product.features).filter(
+            release_year_feature.name.in_(selected_release_years)
+        )
+
     products = query.all()
 
     features = db.session.query(Feature.name).distinct().all()
@@ -119,6 +179,7 @@ def index():
     resolutions = get_resolutions()
     brands = db.session.query(Product.brand).distinct().all()
     brands = [brand[0] for brand in brands]  # Unpack tuples
+    release_years = get_release_years()
 
     return render_template(
         "index.html",
@@ -131,6 +192,9 @@ def index():
         selected_resolutions=selected_resolutions,
         panels=panels,
         selected_panels=selected_panels,
+        selected_others=selected_others,
+        release_years=release_years,
+        selected_release_years=selected_release_years,
     )
 
 
