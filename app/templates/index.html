@@ -16,13 +16,17 @@
   </head>
   <body>
     <aside class="sidebar">
-      <h2>Filters</h2>
+      <h2>꿀매</h2>
       <form
         method="GET"
         action="{{ url_for('main.index') }}"
         onsubmit="concatenateAll()"
       >
-        <input type="button" value="Reset" onclick="resetAllCheckboxes()" />
+        <input
+          type="button"
+          value="필터 초기화"
+          onclick="resetAllCheckboxes()"
+        />
         <fieldset>
           <details>
             <summary>브랜드</summary>
@@ -217,7 +221,6 @@
           id="releaseYearInput"
           value=""
         />
-
         <fieldset>
           <details>
             <summary>기타</summary>
@@ -247,7 +250,8 @@
         </fieldset>
         <input type="hidden" name="other" id="otherInput" value="" />
 
-        <input type="submit" value="Filter" />
+        <input type="submit" value="필터 적용" />
+        <!-- <a onclick="resetAllCheckboxes()" class="reset-filter">필터 초기화</a> -->
       </form>
     </aside>
     <div class="main-content">
@@ -255,14 +259,14 @@
         <table>
           <thead>
             <tr>
-              <th scope="col" class="product-name">Name</th>
+              <th scope="col" class="product-name">이름</th>
               <th scope="col" id="price-header" class="sortable">
-                Price <span id="price-sort-icon"></span>
+                가격 <span id="price-sort-icon"></span>
               </th>
               <th scope="col" id="rating-header" class="sortable">
-                Rating <span id="rating-sort-icon"></span>
+                리뷰 <span id="rating-sort-icon"></span>
               </th>
-              <th scope="col">Features</th>
+              <th scope="col">주요 특징</th>
             </tr>
           </thead>
           <tbody>
@@ -294,8 +298,10 @@
                       ><br />
                       {% for feature in product.features %} {% if
                       feature.feature_code == 1 and feature.value != "" %}
-                      <span class="feature-button">{{ feature.value }}</span>{%
-                      if not loop.last %} {% endif %} {% endif %}{% endfor %}
+                      <span class="feature-button {{ feature.value }}"
+                        >{{ feature.value }}</span
+                      >{% if not loop.last %} {% endif %} {% endif %}{% endfor
+                      %}
                     </a>
                   </div>
                 </div>
