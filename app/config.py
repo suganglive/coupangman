@@ -12,7 +12,7 @@ class Config:
     CELERY_BEAT_SCHEDULE = {
         "daily-scrape-task": {
             "task": "app.tasks.total_scrape_task",
-            "schedule": crontab(minute=0, hour=9),
+            "schedule": crontab(minute=0, hour=17),
         },
     }
 
