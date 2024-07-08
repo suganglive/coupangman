@@ -7,12 +7,12 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Celery configuration
-    CELERY_BROKER_URL = "redis://localhost:6379/0"
-    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+    CELERY_BROKER_URL = "redis://svc.xxx.cloudtype.app:32146/0"
+    CELERY_RESULT_BACKEND = "redis://svc.xxx.cloudtype.app:6379/0"
     CELERY_BEAT_SCHEDULE = {
         "daily-scrape-task": {
             "task": "app.tasks.total_scrape_task",
-            "schedule": crontab(minute=0, hour=17),
+            "schedule": crontab(minute=0, hour=18),
         },
     }
 
