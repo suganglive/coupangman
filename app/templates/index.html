@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>꿀매 리스트</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <script></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <h2>꿀매</h2>
+      <form
+        method="GET"
+        action="{{ url_for('main.index') }}"
+        onsubmit="concatenateAll()"
+      >
+        <input
+          type="button"
+          value="필터 초기화"
+          onclick="resetAllCheckboxes()"
+        />
+        <fieldset>
+          <details>
+            <summary>브랜드</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-brand"
+                  type="checkbox"
+                  onclick="toggleSelectAllBrand(this)"
+                />
+                <label for="select-all-brand">All</label>
+              </div>
+              {% for brand in brands %}
+              <div class="filter-container">
+                <input
+                  id="brand-{{ loop.index }}"
+                  data-name="brand"
+                  type="checkbox"
+                  value="{{ brand }}"
+                  {%
+                  if
+                  brand
+                  in
+                  selected_brands
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label for="brand-{{ loop.index }}" title="{{ brand }}"
+                  >{{ brand }}</label
+                >
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="brand" id="brandInput" value="" />
+        <fieldset>
+          <details>
+            <summary>화면 크기</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-size"
+                  type="checkbox"
+                  onclick="toggleSelectAllSize(this)"
+                />
+                <label for="select-all-size">All</label>
+              </div>
+              {% for size in sizes %}
+              <div class="filter-container">
+                <input
+                  id="size-{{ loop.index }}"
+                  data-name="size"
+                  type="checkbox"
+                  value="{{ size }}"
+                  {%
+                  if
+                  size
+                  in
+                  selected_sizes
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label for="size-{{ loop.index }}" title="{{ size }}"
+                  >{{ size }}</label
+                >
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="size" id="sizeInput" value="" />
+        <fieldset>
+          <details>
+            <summary>화면 종류</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-panel"
+                  type="checkbox"
+                  onclick="toggleSelectAllPanel(this)"
+                />
+                <label for="select-all-panel">All</label>
+              </div>
+              {% for panel in panels %}
+              <div class="filter-container">
+                <input
+                  id="panel-{{ loop.index }}"
+                  data-name="panel"
+                  type="checkbox"
+                  value="{{ panel }}"
+                  {%
+                  if
+                  panel
+                  in
+                  selected_panels
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label for="panel-{{ loop.index }}" title="{{ panel }}"
+                  >{{ panel }}</label
+                >
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="panel" id="panelInput" value="" />
+        <fieldset>
+          <details>
+            <summary>해상도</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-resolution"
+                  type="checkbox"
+                  onclick="toggleSelectAllResolution(this)"
+                />
+                <label for="select-all-resolution">All</label>
+              </div>
+              {% for resolution in resolutions %}
+              <div class="filter-container">
+                <input
+                  id="resolution-{{ loop.index }}"
+                  data-name="resolution"
+                  type="checkbox"
+                  value="{{ resolution }}"
+                  {%
+                  if
+                  resolution
+                  in
+                  selected_resolutions
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label
+                  for="resolution-{{ loop.index }}"
+                  title="{{ resolution }}"
+                  >{{ resolution }}</label
+                >
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="resolution" id="resolutionInput" value="" />
+        <fieldset>
+          <details>
+            <summary>출시년도</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-release-year"
+                  type="checkbox"
+                  onclick="toggleSelectAllReleaseYear(this)"
+                />
+                <label for="select-all-release-year">All</label>
+              </div>
+              {% for release_year in release_years %}
+              <div class="filter-container">
+                <input
+                  id="release-year-{{ loop.index }}"
+                  data-name="release-year"
+                  type="checkbox"
+                  value="{{ release_year }}"
+                  {%
+                  if
+                  release_year
+                  in
+                  selected_release_years
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label
+                  for="release-year-{{ loop.index }}"
+                  title="{{ release_year }}"
+                  >{{ release_year }}</label
+                >
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+        </fieldset>
+        <input
+          type="hidden"
+          name="release_year"
+          id="releaseYearInput"
+          value=""
+        />
+        <fieldset>
+          <details>
+            <summary>기타</summary>
+            <div>
+              <div>
+                <input
+                  id="select-all-others"
+                  type="checkbox"
+                  onclick="toggleSelectAllOthers(this)"
+                />
+                <label for="select-all-others">All</label>
+              </div>
+              <div class="filter-container">
+                <input id="other-smart-tv" data-name="other" type="checkbox"
+                value="smart_tv" {% if "smart_tv" in selected_others %}checked{%
+                endif %} />
+                <label for="other-smart-tv">스마트 TV</label>
+              </div>
+              <div class="filter-container">
+                <input id="other-game-mode" data-name="other" type="checkbox"
+                value="game_mode" {% if "game_mode" in selected_others
+                %}checked{% endif %} />
+                <label for="other-game-mode">게임모드</label>
+              </div>
+            </div>
+          </details>
+        </fieldset>
+        <input type="hidden" name="other" id="otherInput" value="" />
+
+        <input type="submit" value="필터 적용" />
+        <!-- <a onclick="resetAllCheckboxes()" class="reset-filter">필터 초기화</a> -->
+      </form>
+    </aside>
+    <div class="main-content">
+      <main class="container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" class="product-name">이름</th>
+              <th scope="col" id="price-header" class="sortable">
+                가격 <span id="price-sort-icon"></span>
+              </th>
+              <th scope="col" id="rating-header" class="sortable">
+                리뷰 <span id="rating-sort-icon"></span>
+              </th>
+              <th scope="col">주요 특징</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %} {% if product.shorten_url is not
+            none%}
+            <tr>
+              <th scope="row" class="product-name">
+                <div>
+                  <div class="image-box">
+                    <a
+                      href="{{ url_for('main.model', id=product.id) }}"
+                      class="img-link"
+                      target="_blank"
+                      ><img
+                        src="{{ product.product_pic_s }}"
+                        alt="{{ product.short_name }}"
+                    /></a>
+                  </div>
+                  <div class="name-space">
+                    <a
+                      href="{{ url_for('main.model', id=product.id) }}"
+                      class="img-link"
+                      target="_blank"
+                    >
+                      <span title="{{ product.short_name }}"
+                        >{{ product.short_name|truncate }}</span
+                      ><br />
+                      <span class="model-name">({{ product.model_name }})</span
+                      ><br />
+                      {% for feature in product.features %} {% if
+                      feature.feature_code == 1 and feature.value != "" %}
+                      <span class="feature-button {{ feature.value }}"
+                        >{{ feature.value }}</span
+                      >{% if not loop.last %} {% endif %} {% endif %}{% endfor
+                      %}
+                    </a>
+                  </div>
+                </div>
+              </th>
+              <td>
+                <div
+                  class="price-details"
+                  data-discount-rate="{{ product.discount_rate }}"
+                >
+                  <span class="discount-rate"
+                    >{{ product.discount_rate }}%</span
+                  >
+                  <span class="original-price"
+                    >{{ product.highest_price}}원</span
+                  ><br />
+                  <span class="discounted-price"
+                    >{{ product.lowest_price }}원</span
+                  >
+                </div>
+              </td>
+              <td>
+                <div
+                  class="rating-details"
+                  data-rate-count="{{ product.rating_count }}"
+                  data-rating="{{ product.rating }}"
+                >
+                  {% if "no review" not in product.rating_count %}
+                  <span class="rating-stars"></span>
+                  <!-- <span>{{ product.rating }}</span> -->
+                  <span class="rate-count"
+                    >{{ product.rating_count|strip }}개 상품평</span
+                  >
+                  {% else %}
+                  <span class="no-review">No review</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <div class="other-features">
+                  <!-- <span class="feature-button brand container"
+                    >{{ product.brand }}</span
+                  ><br /> -->
+                  {% set feature_code_4_exists = [] %} {% set game_mode_exists =
+                  [] %} {% for feature in product.features %} {% if
+                  feature.feature_code == 4 %} {% set _ =
+                  feature_code_4_exists.append(true) %} {% endif %} {% if
+                  feature.name == "게임모드" %} {% set _ =
+                  game_mode_exists.append(true) %} {% endif %} {% endfor %} {%
+                  set line_break_needed = feature_code_4_exists or
+                  game_mode_exists %} {% if feature_code_4_exists %}
+                  <span class="feature-button">스마트 TV</span>
+                  {% endif %} {% if game_mode_exists %}
+                  <span class="feature-button">게임모드</span>
+                  {% endif %} {% if line_break_needed %}
+                  <br />
+                  {% endif %}
+                  <!-- <br /> -->
+                  {% if "no info" not in product.count %}
+                  <span class="feature-button">{{ product.tv_type }}</span>
+                  {% endif %}{% if "no info" not in product.install_info %}
+                  <span class="feature-button">{{ product.install_info }}</span>
+                  {% endif %} {% for feature in product.features %} {% if
+                  feature.name|match("[0-9]+년형") %}<span
+                    class="feature-button"
+                    >{{ feature.name }}</span
+                  >{% endif %} {% endfor %}
+                </div>
+              </td>
+            </tr>
+            {% endif %} {% endfor %}
+          </tbody>
+        </table>
+      </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>꿀매 제품 상세정보</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      .coupang-button {
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        text-align: center;
+        display: inline-block;
+        text-decoration: none; /* Remove underline from links */
+      }
+
+      .coupang-blue {
+        background-color: #0078d7; /* Blue color */
+      }
+
+      .coupang-blue:hover {
+        background-color: #005ba1; /* Darker blue for hover effect */
+      }
+
+      .coupang-blue:active {
+        background-color: #004080; /* Even darker blue for active effect */
+      }
+
+      .coupang-blue:focus {
+        outline: none; /* Remove default focus outline */
+        box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.5); /* Custom focus outline */
+      }
+
+      .model-basic {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        background-color: #fff;
+      }
+
+      .model-basic img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+      }
+
+      .model-basic h1,
+      .model-basic h3 {
+        margin: 10px 0;
+      }
+      .back-link {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 16px;
+        text-decoration: none;
+        color: #0078d7;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+      .flex-container {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Center child elements horizontally */
+        flex-wrap: wrap; /* Allow wrapping for smaller screens */
+      }
+      .model-basic {
+        margin-right: 20px;
+        flex: 1 1 300px; /* Adjust flex-grow, flex-shrink, and flex-basis */
+      }
+
+      .graph-container {
+        flex: 1 1 700px; /* Adjust flex-grow, flex-shrink, and flex-basis */
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include Chart.js date adapter for Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+  </head>
+  <body>
+    <a href="{{ url_for('main.index') }}" class="back-link">← 꿀매 리스트</a>
+    <div class="container">
+      <div class="flex-container">
+        <div class="model-basic">
+          <img
+            src="{{ product.product_pic_s }}"
+            alt="{{ product.short_name }}"
+          />
+          <h6>{{product.brand}}</h6>
+          <h1>{{ product.model_name }} 상세정보</h1>
+          <h3>{{ product.lowest_price | add_commas }}원</h3>
+          <a
+            href="{{ product.product_url }}"
+            class="coupang-button coupang-blue"
+            target="_blank"
+          >
+            쿠팡에서 바로 구매하기
+          </a>
+        </div>
+        <div class="graph-container">
+          <canvas
+            id="priceHistoryChart"
+            role="img"
+            height="350"
+            width="700"
+            style="
+              display: block;
+              box-sizing: border-box;
+              height: 350px;
+              width: 700px;
+            "
+          ></canvas>
+        </div>
+      </div>
+      <hr />
+      <div class="feature-section">
+        <h2>기본 정보</h2>
+        <table>
+          {% for feature in features[1] %}
+          <tr>
+            {% if feature.name == "resolution" %}
+            <td>해상도</td>
+            {% elif feature.name == "screen_size" %}
+            <td>화면 크기</td>
+            {% elif feature.name == "refresh_rate" %}
+            <td>주사율</td>
+            {% elif feature.name == "display_tech" %}
+            <td>화면 종류</td>
+            {% endif %} {% if feature.value == "1" %}
+            <td>O</td>
+            {% else %}
+            <td>{{ feature.value }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      <div class="feature-section">
+        <h2>화질</h2>
+        <table>
+          {% for feature in features[2] %}
+          <tr>
+            <td>{{ feature.name }}</td>
+            {% if feature.value == "1" %}
+            <td>O</td>
+            {% else %}
+            <td>{{ feature.value }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      <div class="feature-section">
+        <h2>스피커</h2>
+        <table>
+          {% for feature in features[3] %}
+          <tr>
+            <td>{{ feature.name }}</td>
+            {% if feature.value == "1" %}
+            <td>O</td>
+            {% else %}
+            <td>{{ feature.value }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      <div class="feature-section">
+        <h2>스마트 TV</h2>
+        <table>
+          {% for feature in features[4] %}
+          <tr>
+            <td>{{ feature.name }}</td>
+            {% if feature.value == "1" %}
+            <td>O</td>
+            {% else %}
+            <td>{{ feature.value }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      <div class="feature-section">
+        <h2>게임</h2>
+        <table>
+          {% for feature in features[5] %}
+          <tr>
+            <td>{{ feature.name }}</td>
+            {% if feature.value == "1" %}
+            <td>O</td>
+            {% else %}
+            <td>{{ feature.value }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+        const priceHistory = {{ price_history|tojson }};
+
+        const labels = priceHistory.dates.map(days => {
+          const date = new Date();
+          date.setDate(date.getDate() - (89 - days));
+          return date.toISOString().split('T')[0];
+        });
+
+        const minPrice = Math.min(...priceHistory.prices);
+        const maxPrice = Math.max(...priceHistory.prices);
+
+        // Convert minPrice to string, leave first digit unchanged, and turn the remaining digits to zero
+        const minPriceStr = minPrice.toString();
+        const firstDigit = minPriceStr[0];
+        const zeros = '0'.repeat(minPriceStr.length - 1);
+        const yMin = parseFloat(firstDigit + zeros);
+
+        const ctx = document.getElementById('priceHistoryChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '', // Set label to an empty string to hide it from the legend
+              data: priceHistory.prices,
+              borderColor: 'rgba(75, 192, 192, 1)',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              fill: false,
+              tension: 0.1
+            }]
+          },
+          options: {
+            plugins: {
+              legend: {
+                display: false // Hide the legend
+              },
+              title: {
+                display: true,
+                text: '지난 90일 가격 추이' // Chart title
+              }
+            },
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  unit: 'day'
+                }
+              },
+              y: {
+                min: yMin,
+                title: {
+                  display: true,
+                  text: 'Price'
+                }
+              }
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
