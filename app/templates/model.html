@@ -111,7 +111,7 @@
           <h1>{{ product.model_name }} 상세정보</h1>
           <h3>{{ product.lowest_price | add_commas }}원</h3>
           <a
-            href="{{ product.product_url }}"
+            href="{{ product.shorten_url }}"
             class="coupang-button coupang-blue"
             target="_blank"
           >

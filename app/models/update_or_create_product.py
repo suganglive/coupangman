@@ -27,7 +27,7 @@ def update_or_create_product(data):
             product.rating = data["rating"]
             product.rating_count = data["rating_count"]
             product.original_price = data["original_price"]
-            product.sale_price = data["sale_data"]
+            product.sale_price = data["sale_price"]
             product.coupon_price = data["coupon_price"]
             product.highest_price = data["highest_price"]
             product.lowest_price = data["lowest_price"]
