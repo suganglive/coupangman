@@ -139,18 +139,20 @@
         <table>
           {% for feature in features[1] %}
           <tr>
-            {% if feature.name == "resolution" %}
+            {% if feature.name == "resolution" and feature.value != ""%}
             <td>해상도</td>
-            {% elif feature.name == "screen_size" %}
+            <td>{{ feature.value }}</td>
+            {% elif feature.name == "screen_size" and feature.value != ""%}
             <td>화면 크기</td>
-            {% elif feature.name == "refresh_rate" %}
+            <td>{{ feature.value }}</td>
+            {% elif feature.name == "refresh_rate" and feature.value != ""%}
             <td>주사율</td>
-            {% elif feature.name == "display_tech" %}
+            <td>{{ feature.value }}</td>
+            {% elif feature.name == "display_tech" and feature.value != ""%}
             <td>화면 종류</td>
+            <td>{{ feature.value }}</td>
             {% endif %} {% if feature.value == "1" %}
             <td>O</td>
-            {% else %}
-            <td>{{ feature.value }}</td>
             {% endif %}
           </tr>
           {% endfor %}

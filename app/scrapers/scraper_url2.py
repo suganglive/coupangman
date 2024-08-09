@@ -142,9 +142,6 @@ def scrape_url2():
 
     # Set up Chrome options for headless mode
     chrome_options = Options()
-
-    # Set up Chrome options for headless mode
-    chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -152,7 +149,12 @@ def scrape_url2():
     chrome_options.add_argument("--window-size=1920,1080")
 
     # Initialize undetected-chromedriver
-    driver = uc.Chrome(options=chrome_options)
+    driver = uc.Chrome(options=chrome_options, browser_executable_path="/usr/bin/chromium", driver_executable_path="/usr/bin/chromedriver")
+#     driver = uc.Chrome(
+#     options=chrome_options,
+#     browser_executable_path="/usr/bin/google-chrome",  # Path for Google Chrome
+#     driver_executable_path="/tmp/chromedriver"          # Path for Chromedriver
+# )
     wait = WebDriverWait(driver, 100)
 
     # Example of navigating to a website

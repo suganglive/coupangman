@@ -22,7 +22,7 @@ def scrape_features():
     products = Product.query.all()
 
     for product in products:
-        # Skip products whose features have already been scraped
+        # # Skip products whose features have already been scraped
         if product.features_scraped:
             print(
                 f"Features for product {product.model_name} already scraped. Skipping."
@@ -61,7 +61,13 @@ def scrape_features():
                     temp = temp.text.strip()
                     if temp == "TV":
                         break
-        spec_list = item.find("div", class_="spec_list")
+        temp = None
+        temp = item.find("div", class_="spec-box--full")
+        if temp:
+            spec_list = temp.find("div", class_="spec_list")
+        else:
+            continue
+
         if spec_list:
             spec_list = spec_list.text
             spec_list = spec_list.split("/")
@@ -135,6 +141,12 @@ def scrape_features():
                     if feature == "크기(가로x세로x깊이)":
                         continue
                     code = codes[cat]
+                    # print(
+                    #     feature,
+                    #     dic[cat][feature],
+                    #     code,
+                    #     product,
+                    # )
                     check_and_add_feature_name(
                         name=feature,
                         value=dic[cat][feature],

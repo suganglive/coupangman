@@ -41,6 +41,11 @@ def best_offer_task():
     with app.app_context():
         isit_best_offer()
 
+@celery.task
+def delete_old_products_task():
+    with app.app_context():
+        delete_old_products()
+
 
 @celery.task
 def total_scrape_task():

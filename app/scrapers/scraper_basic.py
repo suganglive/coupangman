@@ -45,10 +45,15 @@ def scrape_data():
             product_list = soup.find(
                 "ul",
                 id="productList",
-            ).find_all(
-                "li",
-                class_="search-product",
             )
+            if product_list:
+                product_list = product_list.find_all(
+                    "li",
+                    class_="search-product",
+                )
+            else:
+                print("no product list")
+                break
 
             for product in product_list:
                 out_of_stock = product.find("div", class_="out-of-stock")
